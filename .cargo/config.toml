@@ -1,0 +1,18 @@
+[build]
+target = "riscv32imac-unknown-none-elf"
+
+[target.riscv32imac-unknown-none-elf]
+rustflags = [
+	"-C", "link-arg=-Tmemory.x",
+	"-C", "link-arg=-Ttests.x",
+	"-C", "link-arg=-Tlink.x",
+]
+
+runner = """
+qemu-system-riscv32 \
+-machine virt \
+-nographic \
+-bios none \
+-semihosting-config enable=on,target=native \
+-kernel
+"""

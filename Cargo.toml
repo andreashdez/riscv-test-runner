@@ -1,0 +1,25 @@
+[package]
+name = "riscv-test-runner"
+version = "0.1.0"
+edition = "2024"
+
+[[bin]]
+name = "riscv-test-runner"
+path = "src/main.rs"
+test = false
+bench = false
+
+[dependencies]
+riscv = { version = "0.16", features = ["critical-section-single-hart"] }
+riscv-rt = "0.18"
+heapless = "0.9"
+embedded-alloc = "0.7"
+semihosting = { version = "0.1", features = ["stdio", "panic-handler"] }
+riscv-test-macros = { path = "riscv-test-macros" }
+
+[profile.dev]
+opt-level = 1
+
+[profile.release]
+opt-level = 2
+lto = true
