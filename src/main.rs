@@ -3,15 +3,14 @@
 
 extern crate alloc;
 
-mod assertions;
+mod testing;
 
-use alloc::vec;
-use alloc::vec::Vec;
-use alloc::{format, string::String};
-use assertions::TestResult;
+use alloc::{format, string::String, vec, vec::Vec};
 use embedded_alloc::LlffHeap as Heap;
 use riscv_rt::entry;
 use riscv_test_macros::riscv_test;
+use testing::TestResult;
+use testing::{assertions, runner};
 
 #[global_allocator]
 static HEAP: Heap = Heap::empty();
@@ -70,7 +69,7 @@ pub fn test_passing_vec_sorting() -> TestResult {
     let mut actual = create_vector_on_heap(vec_len);
     actual.reverse();
     assertions::assert(actual, expected, |a, b| {
-        a.iter().zip(&b).filter(|&(a, b)| a == b).count() == vec_len
+        a.iter().zip(b).filter(|&(a, b)| a == b).count() == vec_len
     })
 }
 
@@ -80,7 +79,7 @@ fn main() -> ! {
         embedded_alloc::init!(HEAP, 1024);
     }
 
-    let failures = assertions::run_tests();
+    let failures = runner::run_tests();
 
     semihosting::process::exit(if failures == 0 { 0 } else { 1 });
 

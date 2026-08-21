@@ -16,8 +16,8 @@ pub fn riscv_test(_attribute: TokenStream, item: TokenStream) -> TokenStream {
             #[used]
             #[unsafe(link_section = #section_name)]
 
-            static TEST_CASE: crate::assertions::Test =
-                crate::assertions::Test::new(
+            static TEST_CASE: crate::testing::registry::Test =
+                crate::testing::registry::Test::new(
                     concat!(
                         module_path!(),
                         "::",

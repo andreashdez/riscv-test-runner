@@ -1,51 +1,4 @@
-use alloc::{format, string::String};
-use core::fmt::Debug;
-
-pub enum TestResult {
-    Passed,
-    Failed(String),
-    Error,
-}
-
-pub fn assert<T, F>(actual: T, expected: T, test_logic: F) -> TestResult
-where
-    T: Debug + PartialEq + Clone,
-    F: FnOnce(T, T) -> bool,
-{
-    match (test_logic)(actual.clone(), expected.clone()) {
-        true => TestResult::Passed,
-        false => TestResult::Failed(format!(
-            "expected {:?} to be equal to {:?}",
-            expected, actual
-        )),
-    }
-}
-
-pub fn assert_eq<T>(actual: T, expected: T) -> TestResult
-where
-    T: Debug + PartialEq,
-{
-    match actual == expected {
-        true => TestResult::Passed,
-        false => TestResult::Failed(format!(
-            "expected {:?} to be equal to {:?}",
-            expected, actual
-        )),
-    }
-}
-
-pub fn assert_ne<T>(actual: T, expected: T) -> TestResult
-where
-    T: Debug + PartialEq,
-{
-    match actual != expected {
-        true => TestResult::Passed,
-        false => TestResult::Failed(format!(
-            "expected {:?} to not be equal to {:?}",
-            expected, actual
-        )),
-    }
-}
+use crate::testing::TestResult;
 
 #[repr(C)]
 pub struct Test {
@@ -99,30 +52,4 @@ pub fn registered_tests() -> &'static [Test] {
 
         core::slice::from_raw_parts(start as *const Test, bytes / test_size)
     }
-}
-
-pub fn run_tests() -> usize {
-    let tests = registered_tests();
-    let mut failures = 0;
-
-    semihosting::println!("running {} tests", tests.len());
-
-    for test in tests {
-        match test.run() {
-            TestResult::Passed => {
-                semihosting::println!("passed {}", test.name);
-            }
-            TestResult::Failed(message) => {
-                semihosting::println!("failed {} => {}", test.name, message);
-                failures += 1;
-            }
-            TestResult::Error => {
-                semihosting::println!("error on {}", test.name);
-            }
-        }
-    }
-
-    semihosting::println!("{} passed; {} failed", tests.len() - failures, failures,);
-
-    failures
 }
