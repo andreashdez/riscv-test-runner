@@ -12,7 +12,6 @@ impl Test {
     }
 
     pub fn run(&self) -> TestResult {
-        semihosting::println!("  running test {}", self.name);
         (self.function)()
     }
 }

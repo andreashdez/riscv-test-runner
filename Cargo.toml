@@ -9,12 +9,16 @@ path = "src/main.rs"
 test = false
 bench = false
 
+[features]
+stress-tests = []
+
 [dependencies]
 riscv = { version = "0.16", features = ["critical-section-single-hart"] }
 riscv-rt = "0.18"
 heapless = "0.9"
 embedded-alloc = "0.7"
 semihosting = { version = "0.1", features = ["stdio", "panic-handler"] }
+owo-colors = "4"
 riscv-test-macros = { path = "riscv-test-macros" }
 
 [profile.dev]

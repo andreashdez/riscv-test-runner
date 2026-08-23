@@ -1,18 +1,19 @@
 use crate::testing::TestResult;
-use alloc::format;
 use core::fmt::Debug;
+use heapless::{String, format};
 
-pub fn assert<T, F>(actual: T, expected: T, test_logic: F) -> TestResult
+pub fn assert<T, U, F>(actual: T, expected: U, test_logic: F) -> TestResult
 where
     T: Debug,
-    F: FnOnce(&T, &T) -> bool,
+    U: Debug,
+    F: FnOnce(&T, &U) -> bool,
 {
     match (test_logic)(&actual, &expected) {
         true => TestResult::Passed,
-        false => TestResult::Failed(format!(
-            "expected {:?} to be equal to {:?}",
-            expected, actual
-        )),
+        false => TestResult::Failed(
+            format!(64; "  expected: {:?}\n  actual: {:?}", expected, actual)
+                .unwrap_or(String::<64>::try_from("failed").unwrap()),
+        ),
     }
 }
 
@@ -22,10 +23,10 @@ where
 {
     match actual == expected {
         true => TestResult::Passed,
-        false => TestResult::Failed(format!(
-            "expected {:?} to be equal to {:?}",
-            expected, actual
-        )),
+        false => TestResult::Failed(
+            format!(64; "\n  should equal\n    expected: {:?}\n    actual: {:?}", expected, actual)
+                .unwrap_or(String::<64>::try_from("failed").unwrap()),
+        ),
     }
 }
 
@@ -35,9 +36,9 @@ where
 {
     match actual != expected {
         true => TestResult::Passed,
-        false => TestResult::Failed(format!(
-            "expected {:?} to not be equal to {:?}",
-            expected, actual
-        )),
+        false => TestResult::Failed(
+            format!(64; "\n  should not equal\n    expected: {:?}\n    actual: {:?}", expected, actual)
+                .unwrap_or(String::<64>::try_from("fail").unwrap()),
+        ),
     }
 }
