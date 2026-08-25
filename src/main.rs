@@ -17,15 +17,16 @@ static HEAP: Heap = Heap::empty();
 #[entry]
 fn main() -> ! {
     unsafe {
-        // embedded_alloc::init!(HEAP, 256);
-        // embedded_alloc::init!(HEAP, 1024);
-        embedded_alloc::init!(HEAP, 4096);
+        embedded_alloc::init!(HEAP, 64 * 1024);
     }
-    let before = HEAP.used();
-    let result = runner::run_tests();
-    let after = HEAP.used();
+    let used_heap_before = HEAP.used();
+    let test_runner = runner::TestRunner::new(false, &HEAP);
+    let result = test_runner.run_tests();
+    let used_heap_after = HEAP.used();
 
-    semihosting::println!("MEMORY USAGE\n before: {}\n after: {}", before, after);
+    if used_heap_after > 0 || used_heap_before > 0 {
+        semihosting::println!("MEMORY USAGE\n before: {}\n after: {}", used_heap_before, used_heap_after);
+    }
     match result {
         Ok(_) => semihosting::process::exit(0),
         Err(err) => match err {

@@ -10,6 +10,7 @@ rustflags = [
 
 runner = """
 qemu-system-riscv32 \
+-m 4M \
 -machine virt \
 -nographic \
 -bios none \
