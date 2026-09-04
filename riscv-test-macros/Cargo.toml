@@ -6,6 +6,10 @@ edition = "2024"
 [lib]
 proc-macro = true
 
+[features]
+default = []
+stress-test-generation = []
+
 [dependencies]
 quote = "1"
 syn = { version = "3", features = ["full"] }

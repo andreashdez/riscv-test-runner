@@ -10,7 +10,8 @@ test = false
 bench = false
 
 [features]
-stress-tests = []
+stress-tests = ["riscv-test-macros/stress-test-generation"]
+stress-negative-tests = ["stress-tests"]
 
 [dependencies]
 riscv = { version = "0.16", features = ["critical-section-single-hart"] }

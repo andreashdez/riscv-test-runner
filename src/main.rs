@@ -28,7 +28,7 @@ fn main() -> ! {
         semihosting::println!("MEMORY USAGE\n before: {}\n after: {}", used_heap_before, used_heap_after);
     }
     match result {
-        Ok(_) => semihosting::process::exit(0),
+        Ok(()) => semihosting::process::exit(0),
         Err(err) => match err {
             TestRunnerFailure::Error => semihosting::process::exit(2),
             TestRunnerFailure::Failed => semihosting::process::exit(1),

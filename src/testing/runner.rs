@@ -8,7 +8,7 @@ pub struct TestRunner<'a> {
 }
 
 impl<'a> TestRunner<'a> {
-    pub fn new(quiet: bool, heap: &'a Heap) -> TestRunner<'a> {
+    pub const fn new(quiet: bool, heap: &'a Heap) -> Self {
         Self { quiet, heap }
     }
 
@@ -58,11 +58,11 @@ impl<'a> TestRunner<'a> {
         semihosting::println!("{} {}", errors.red(), "errors".red());
 
         if errors > 0 {
-            return Err(TestRunnerFailure::Error);
+            Err(TestRunnerFailure::Error)
         } else if failures > 0 {
-            return Err(TestRunnerFailure::Failed);
+            Err(TestRunnerFailure::Failed)
         } else {
-            return Ok(());
+            Ok(())
         }
     }
 }

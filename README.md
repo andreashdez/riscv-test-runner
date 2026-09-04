@@ -58,24 +58,37 @@ Enable the optional stress-test suite with:
 cargo run --features stress-tests
 ```
 
-The suite registers 1,502 tests:
+The suite registers 1,500 deterministic tests, split evenly across six
+workloads:
 
-- 500 integer-addition tests
-- 500 heap-allocation tests
-- 500 heap-allocation and vector-sorting tests
-- 1 intentional assertion failure
-- 1 intentional execution error
+- wrapping arithmetic pipelines
+- bit rotations, reversal, and population counts
+- seeded checksum loops of varying lengths
+- fixed-capacity `heapless::Vec` construction and hashing
+- fallible heap allocation, data generation, and hashing
+- fallible heap allocation, unstable sorting, and result verification
 
-With the current 4 KiB heap, some allocation-heavy cases are expected to run
-out of memory. A development run ends with this summary:
+The procedural macro calculates each expected result on the host and embeds it
+in a uniquely named test wrapper. The target recalculates the actual result at
+runtime, with `black_box` preventing the important operations from being
+optimized away. With the current heap, the suite ends successfully:
 
 ```text
-1063 passed; 1 failed; 438 errors
+1500 passed; 0 failed; 0 errors
 ```
 
-This suite is meant to exercise test discovery, result reporting, allocator
-failure handling, and cleanup between a large number of tests. Its failures and
-errors are intentional.
+To additionally exercise failure and error reporting, enable the negative-test
+feature. It includes the complete stress suite automatically:
+
+```sh
+cargo run --features stress-negative-tests
+```
+
+That run deliberately exits with an error and reports:
+
+```text
+1500 passed; 1 failed; 1 errors
+```
 
 ## Write a test
 
@@ -88,21 +101,21 @@ use testing::{TestResult, assertions};
 
 #[riscv_test]
 fn test_addition() -> TestResult {
-    assertions::assert_eq(2 + 2, 4)
+    assertions::assert_eq!(2 + 2, 4)
 }
 ```
 
-The built-in assertion helpers are:
+The built-in assertion macros are:
 
-- `assert_eq(actual, expected)`
-- `assert_ne(actual, expected)`
-- `assert(actual, expected, comparison)` for custom comparison logic and
+- `assert_eq!(actual, expected)`
+- `assert_ne!(actual, expected)`
+- `assert!(actual, expected, comparison)` for custom comparison logic and
   differently typed actual and expected values
 
 For example, a custom assertion can compare a vector with an expected length:
 
 ```rust
-assertions::assert(items, expected_len, |items, len| items.len() == *len)
+assertions::assert!(items, expected_len, |items, len| items.len() == *len)
 ```
 
 ## Results and exit status
@@ -129,7 +142,7 @@ one test returned an error. Errors take precedence over failures.
 ├── build.rs                 # Makes the linker scripts available to Cargo
 ├── memory.x                 # Memory map for QEMU's virt machine
 ├── tests.x                  # Linker section containing registered tests
-├── riscv-test-macros/       # Implementation of #[riscv_test]
+├── riscv-test-macros/       # Test registration and stress generation macros
 └── src/
     ├── main.rs              # Heap setup, test execution, and exit handling
     ├── stress_tests.rs      # Optional large test suite
@@ -143,7 +156,7 @@ one test returned an error. Errors take precedence over failures.
 
 This is an experimental runner with a deliberately narrow setup: one
 `riscv32imac` target, QEMU's `virt` machine, a single hart, and semihosted I/O.
-The global allocator is currently initialized with a 4 KiB heap.
+The global allocator is currently initialized with a 64 KiB heap.
 
 ## License
 
